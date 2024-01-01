@@ -19,7 +19,7 @@ window.mainloop()
 '''
 import customtkinter
 import customtkinter as ctk
-from PIL import Image, ImageTk
+#from PIL import Image, ImageTk
 
 
 class Frame(ctk.CTkFrame):
@@ -41,6 +41,7 @@ class Frame(ctk.CTkFrame):
         return btn_list
 
     def add_lbl(self):
+        self.grid(row=5, column=5, padx=20, pady=5)
         self.lbl = ctk.CTkLabel(self, text='\n\n\nWelcome to my project!\nInstructions:\n1. Choose your theme\n'
                                       '2. Click the Start button and select the desired operation\n'
                                       '', font=('Roboto', 20),
@@ -49,13 +50,14 @@ class Frame(ctk.CTkFrame):
                                 corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
         self.btn.pack(padx=5, pady=15)
         self.lbl.pack(padx=5, pady=10)
+        #TODO Look for the solution to passing value from the command function using StringVar in the saved link
+        '''if stringvar:
+            btns.btns()'''
 
     def delete_frame(self):
         for widgets in self.winfo_children():
             widgets.destroy()
-            print(widgets)
-        for widgets in self.winfo_children():
-            widgets.destroy()
+        self.grid_remove()
 
 
 class TabView(ctk.CTkTabview):
@@ -100,6 +102,7 @@ class TabView(ctk.CTkTabview):
             elif 'All' in btn.cget('text'):
                 btn.configure(command=self.all_tab)
 
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -108,14 +111,16 @@ class App(ctk.CTk):
         ctk.set_default_color_theme('dark-blue')
         self.grid_columnconfigure(0, weight=1, minsize=50)
 
+    def intro(self):
         self.lbl_frame = Frame(self, border_width=2, border_color='red')
         self.lbl_frame.add_lbl()
-        self.lbl_frame.grid(row=5, column=5, padx=20, pady=5, sticky='nsew')
 
+    def btns(self):
         self.btn_frame = Frame(self, border_width=2, border_color='orange')
         self.btn_list = self.btn_frame.add_btns()
         self.btn_frame.grid(column=0, sticky='w')
 
+    def tabs(self):
         self.tab_view = TabView(self)
         if self.tab_view.add_command(self.btn_list):
             self.tab_view.grid(row=3, column=3)
@@ -144,4 +149,6 @@ for i in range(6):
     btn.pack(padx=2, pady=2)'''
 
 app = App()
+app.intro()
+
 app.mainloop()
