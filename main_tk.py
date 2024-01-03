@@ -47,7 +47,7 @@ class Frame(ctk.CTkFrame):
                                       '2. Click the Start button and select the desired operation\n'
                                       '', font=('Roboto', 20),
                                       text_color='green')
-        self.btn = ctk.CTkButton(self, text='Start', width=70, height=50,border_width=2, border_color='green',
+        self.btn = ctk.CTkButton(self, text='Start', width=70, height=50, border_width=2, border_color='green',
                                 corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
         self.btn.pack(padx=5, pady=15)
         self.lbl.pack(padx=5, pady=10)
@@ -62,9 +62,17 @@ class Frame(ctk.CTkFrame):
 class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+    def add(self, tab_name):
+        tab = super().add(tab_name)
+        self.grid(column=0, row=5, padx=50)
+        return tab
 
     def read_tab(self):
         self.add('Read Tab')
+        self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32)
+        self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32)
+        self.btn_csv.pack(padx=20, pady=10)
+        self.btn_xlsx.pack(padx=20, pady=40)
 
     def parse_tab(self):
         self.add('Parse Tab')
@@ -116,15 +124,14 @@ class App(ctk.CTk):
         self.lbl_frame.add_lbl()
 
     def btns(self):
-        self.btn_frame = Frame(self, border_width=2, border_color='orange')
+        self.btn_frame = Frame(self, border_width=5, border_color='orange')
         self.btn_list = self.btn_frame.add_btns()
         self.btn_frame.grid(column=0, sticky='w')
+        self.tabs()
 
     def tabs(self):
-        self.tab_view = TabView(self)
-        if self.tab_view.add_command(self.btn_list):
-            self.tab_view.grid(row=3, column=3)
-            self.lbl_frame.grid_forget()
+        self.tab_view = TabView(self, corner_radius=32, fg_color='silver')
+        self.tab_view.add_command(self.btn_list)
 
 
 app = App()
