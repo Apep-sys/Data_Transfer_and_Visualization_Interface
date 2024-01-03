@@ -25,6 +25,7 @@ import customtkinter as ctk
 class Frame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.master = master
 
     def add_btns(self):
         btn_names = ['Read CSV/XLSX', 'Parse CSV/XLSX', 'Graph the Data', 'Send to TCP', 'RS232 Communication',
@@ -41,7 +42,7 @@ class Frame(ctk.CTkFrame):
         return btn_list
 
     def add_lbl(self):
-        self.grid(row=5, column=5, padx=20, pady=5)
+        self.grid(row=0, column=0, padx=20, pady=50, sticky='nsew')
         self.lbl = ctk.CTkLabel(self, text='\n\n\nWelcome to my project!\nInstructions:\n1. Choose your theme\n'
                                       '2. Click the Start button and select the desired operation\n'
                                       '', font=('Roboto', 20),
@@ -50,14 +51,12 @@ class Frame(ctk.CTkFrame):
                                 corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
         self.btn.pack(padx=5, pady=15)
         self.lbl.pack(padx=5, pady=10)
-        #TODO Look for the solution to passing value from the command function using StringVar in the saved link
-        '''if stringvar:
-            btns.btns()'''
 
     def delete_frame(self):
         for widgets in self.winfo_children():
             widgets.destroy()
         self.grid_remove()
+        self.master.btns()
 
 
 class TabView(ctk.CTkTabview):
@@ -104,6 +103,7 @@ class TabView(ctk.CTkTabview):
 
 
 class App(ctk.CTk):
+
     def __init__(self):
         super().__init__()
         self.geometry('800x500')
@@ -127,28 +127,8 @@ class App(ctk.CTk):
             self.lbl_frame.grid_forget()
 
 
-'''window = ctk.CTk()
-window.geometry('800x600')
-ctk.set_appearance_mode('dark')
-ctk.set_default_color_theme("dark-blue")
-
-btn_names = ['Read CSV/XLSX', 'Parse CSV/XLSX', 'Graph the Data', 'Send to TCP', 'RS232 Communication',
-             'All of the Above']
-
-def btn_open(btn):
-    btn._fg_color = 'red'
-    btn._hover_color = 'gold'
-
-for i in range(6):
-    window.rowconfigure(i, weight=1, minsize=75)
-    window.columnconfigure(0, weight=1, minsize=50)
-    frame = ctk.CTkFrame(window)
-    frame.grid(row=i, column=0, padx=2, pady=2)
-    btn = ctk.CTkButton(frame, text=btn_names[i], corner_radius=32)
-    btn.command = btn_open(btn)
-    btn.pack(padx=2, pady=2)'''
-
 app = App()
 app.intro()
+
 
 app.mainloop()
