@@ -69,7 +69,6 @@ class Frame(ctk.CTkFrame):
         elif ctk.get_appearance_mode() == 'Light':
             ctk.set_appearance_mode('dark')
 
-
 class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
