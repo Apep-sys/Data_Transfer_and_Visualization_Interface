@@ -19,7 +19,9 @@ window.mainloop()
 '''
 import customtkinter
 import customtkinter as ctk
-#from PIL import Image, ImageTk
+
+
+# from PIL import Image, ImageTk
 
 
 class Frame(ctk.CTkFrame):
@@ -35,8 +37,8 @@ class Frame(ctk.CTkFrame):
         for i in range(6):
             self.grid(row=i, column=0, pady=5)
             self.btn = ctk.CTkButton(self, text=btn_names[i], width=70, height=50,
-                                border_width=2, border_color='green', corner_radius=32,
-                                font=('Roboto', 14))
+                                     border_width=2, border_color='green', corner_radius=32,
+                                     font=('Roboto', 14))
             self.btn.pack(padx=5, pady=15)
             btn_list.append(self.btn)
         return btn_list
@@ -44,13 +46,20 @@ class Frame(ctk.CTkFrame):
     def add_lbl(self):
         self.grid(row=0, column=0, padx=20, pady=50, sticky='nsew')
         self.lbl = ctk.CTkLabel(self, text='\n\n\nWelcome to my project!\nInstructions:\n1. Choose your theme\n'
-                                      '2. Click the Start button and select the desired operation\n'
-                                      '', font=('Roboto', 20),
-                                      text_color='green')
+                                           '2. Click the Start button and select the desired operation\n'
+                                           '', font=('Roboto', 20),
+                                text_color='green')
         self.btn = ctk.CTkButton(self, text='Start', width=70, height=50, border_width=2, border_color='green',
-                                corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
+                                 corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
+
+        # TODO Add the function for changing the theme
+        self.change_theme = ctk.CTkButton(self, text='Change the Theme', width=70, height=50, border_width=2,
+                                          border_color='green', corner_radius=32, font=('Roboto', 14),
+                                          )
+
         self.btn.pack(padx=5, pady=15)
-        self.lbl.pack(padx=5, pady=10)
+        self.change_theme.pack(padx=5, pady=15)
+        self.lbl.pack(padx=5, pady=20)
 
     def delete_frame(self):
         for widgets in self.winfo_children():
@@ -62,6 +71,7 @@ class Frame(ctk.CTkFrame):
 class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+
     def add(self, tab_name):
         tab = super().add(tab_name)
         self.grid(column=0, row=5, padx=50)
@@ -71,23 +81,40 @@ class TabView(ctk.CTkTabview):
         self.add('Read Tab')
         self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32)
         self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32)
-        self.btn_csv.pack(padx=20, pady=10)
-        self.btn_xlsx.pack(padx=20, pady=40)
+        self.btn_csv.pack(padx=10, pady=20)
+        self.btn_xlsx.pack(padx=10, pady=20)
 
     def parse_tab(self):
         self.add('Parse Tab')
 
     def graph_tab(self):
         self.add('Graph Tab')
+        graph_names = ['Graph Humidity', 'Graph Temperature', 'Graph Speed', 'Graph Position']
+        for i in range(4):
+            self.btn = ctk.CTkButton(self.tab('Graph Tab'), text=graph_names[i], corner_radius=32)
+            self.btn.pack(padx=10, pady=20)
 
     def tcp_tab(self):
         self.add('TCP Tab')
 
+        # TODO To add the red colour for closing buttons
+        self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32)
+
+        self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32)
+        self.open_tcp.pack(padx=10, pady=20)
+        self.close_tcp.pack(padx=10, pady=20)
+
     def rs232_tab(self):
         self.add('RS232 Tab')
+        self.rs_open = ctk.CTkButton(self.tab('RS232 Tab'), text='Start RS Communication', corner_radius=32)
+        self.rs_close = ctk.CTkButton(self.tab('RS232 Tab'), text='Close RS Communication', corner_radius=32)
+        self.rs_open.pack(padx=10, pady=20)
+        self.rs_close.pack(padx=10, pady=20)
 
     def all_tab(self):
         self.add('All Tab')
+        self.btn = ctk.CTkButton(self.tab('All Tab'), text='Execute Command', corner_radius=32)
+        self.btn.pack(padx=10, pady=20)
 
     def add_command(self, btn_list):
         for btn in btn_list:
@@ -136,6 +163,5 @@ class App(ctk.CTk):
 
 app = App()
 app.intro()
-
 
 app.mainloop()
