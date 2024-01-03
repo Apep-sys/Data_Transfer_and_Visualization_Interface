@@ -19,8 +19,6 @@ window.mainloop()
 '''
 import customtkinter
 import customtkinter as ctk
-
-
 # from PIL import Image, ImageTk
 
 
@@ -30,8 +28,8 @@ class Frame(ctk.CTkFrame):
         self.master = master
 
     def add_btns(self):
-        btn_names = ['Read CSV/XLSX', 'Parse CSV/XLSX', 'Graph the Data', 'Send to TCP', 'RS232 Communication',
-                     'All of the Above']
+        btn_names = ['Read CSV/XLSX', 'Graph the Data', 'Send to TCP', 'RS232 Communication',
+                     'All of the Above', 'Close Application']
         btn_list = []
 
         for i in range(6):
@@ -51,14 +49,12 @@ class Frame(ctk.CTkFrame):
                                 text_color='green')
         self.btn = ctk.CTkButton(self, text='Start', width=70, height=50, border_width=2, border_color='green',
                                  corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
-
-        # TODO Add the function for changing the theme
-        self.change_theme = ctk.CTkButton(self, text='Change the Theme', width=70, height=50, border_width=2,
-                                          border_color='green', corner_radius=32, font=('Roboto', 14),
-                                          )
+        self.theme_btn = ctk.CTkButton(self, text='Change the Theme', width=70, height=50, border_width=2,
+                                       border_color='green', corner_radius=32, font=('Roboto', 14),
+                                       command=self.change_theme)
 
         self.btn.pack(padx=5, pady=15)
-        self.change_theme.pack(padx=5, pady=15)
+        self.theme_btn.pack(padx=5, pady=15)
         self.lbl.pack(padx=5, pady=20)
 
     def delete_frame(self):
@@ -66,6 +62,12 @@ class Frame(ctk.CTkFrame):
             widgets.destroy()
         self.grid_remove()
         self.master.btns()
+
+    def change_theme(self):
+        if ctk.get_appearance_mode() == 'Dark':
+            ctk.set_appearance_mode('light')
+        elif ctk.get_appearance_mode() == 'Light':
+            ctk.set_appearance_mode('dark')
 
 
 class TabView(ctk.CTkTabview):
@@ -83,9 +85,6 @@ class TabView(ctk.CTkTabview):
         self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32)
         self.btn_csv.pack(padx=10, pady=20)
         self.btn_xlsx.pack(padx=10, pady=20)
-
-    def parse_tab(self):
-        self.add('Parse Tab')
 
     def graph_tab(self):
         self.add('Graph Tab')
@@ -116,13 +115,16 @@ class TabView(ctk.CTkTabview):
         self.btn = ctk.CTkButton(self.tab('All Tab'), text='Execute Command', corner_radius=32)
         self.btn.pack(padx=10, pady=20)
 
+    def close_tab(self):
+        self.add('Close Tab')
+
     def add_command(self, btn_list):
         for btn in btn_list:
             if 'Read' in btn.cget('text'):
                 btn.configure(command=self.read_tab)
 
-            elif 'Parse' in btn.cget('text'):
-                btn.configure(command=self.parse_tab)
+            elif 'Close' in btn.cget('text'):
+                btn.configure(command=self.close_tab)
 
             elif 'Graph' in btn.cget('text'):
                 btn.configure(command=self.graph_tab)
