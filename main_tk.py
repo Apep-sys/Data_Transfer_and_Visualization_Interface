@@ -1,24 +1,5 @@
-'''import tkinter as tk
-
-def tk_interface():
-    pass
-
-window = tk.Tk()
-
-btn_names = ['Read CSV/XLSX', 'Parse CSV', 'Graph the Data', 'Send to TCP', 'RS232 Communication',
-             'All of the Above']
-for i in range(6):
-    window.rowconfigure(i, weight=1, minsize=75)
-    window.columnconfigure(0, weight=1, minsize=50)
-    frame = tk.Frame(window, relief=tk.RAISED, bg='turquoise', borderwidth=1)
-    frame.grid(row=i, column=0, padx=5, pady=5, sticky='nsew')
-    btn = tk.Button(frame, text=btn_names[i], fg='gold', bg='indianred')
-    btn.pack(padx=5, pady=5)
-
-window.mainloop()
-'''
-import customtkinter
 import customtkinter as ctk
+import parse_file as ps
 # from PIL import Image, ImageTk
 
 
@@ -72,6 +53,8 @@ class Frame(ctk.CTkFrame):
 class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.active_csv = False
+        self.active_xlsx = False
 
     def add(self, tab_name):
         tab = super().add(tab_name)
@@ -80,10 +63,45 @@ class TabView(ctk.CTkTabview):
 
     def read_tab(self):
         self.add('Read Tab')
-        self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32)
-        self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32)
-        self.btn_csv.pack(padx=10, pady=20)
-        self.btn_xlsx.pack(padx=10, pady=20)
+        self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
+                                     command=self.press_csv)
+        self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
+                                      command=self.press_xlsx)
+        self.btn_csv.pack(padx=10, pady=40)
+        self.btn_xlsx.pack(padx=10, pady=40)
+
+    def press_csv(self):
+        self.active_csv = True
+        self.csv_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as CSV',
+                                          corner_radius=32, font=('Roboto', 14),
+                                          command=ps.process_csv('CSV'))
+        self.csv_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as XLSX',
+                                          corner_radius=32, font=('Roboto', 14),
+                                          command=ps.process_csv('XLSX'))
+        self.csv_csv.pack(padx=3, pady=10)
+        self.csv_xlsx.pack(padx=3, pady=10)
+
+        self.btn_csv.pack_forget()
+        self.btn_xlsx.pack_forget()
+        if self.active_xlsx is False:
+            self.btn_xlsx.pack(padx=10, pady=30)
+
+    def press_xlsx(self):
+        self.active_xlsx = True
+        self.xlsx_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as CSV',
+                                          corner_radius=32, font=('Roboto', 14),
+                                          command=ps.process_csv('CSV'))
+        self.xlsx_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as XLSX',
+                                           corner_radius=32, font=('Roboto', 14),
+                                           command=ps.process_csv('XLSX'))
+        self.xlsx_csv.pack(padx=3, pady=10)
+        self.xlsx_xlsx.pack(padx=3, pady=10)
+
+        self.btn_xlsx.pack_forget()
+        self.btn_csv.pack_forget()
+        if self.active_csv is False:
+            self.btn_csv.pack(padx=10, pady=30)
+
 
     def graph_tab(self):
         self.add('Graph Tab')

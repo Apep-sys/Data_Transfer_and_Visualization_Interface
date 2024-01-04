@@ -1,11 +1,6 @@
 import pandas as pd
 
-
-def press_csv():
-    pass
-
-
-def process_csv():
+def process_csv(mode):
     df = pd.read_csv('D:\\Downloads\\Date_CSV.csv')
     col_names = df.columns.tolist()
     temp_file = []
@@ -29,13 +24,18 @@ def process_csv():
         elif 'Viteza' in name:
             viteza_file.extend(file)
 
-    for file in file_list:
-        if file_list.get(file):
-            csv_file = pd.DataFrame({file: file_list.get(file)})
-            csv_file.to_csv(f'D:\\Downloads\\{file}.csv', index_label='Index')
+    if mode == 'CSV':
+        for file in file_list:
+            if file_list.get(file):
+                csv_file = pd.DataFrame({file: file_list.get(file)})
+                csv_file.to_csv(f'D:\\Downloads\\{file}.csv', index_label='Index')
+    elif mode == 'XLSX':
+        for file in file_list:
+            if file_list.get(file):
+                csv_file = pd.DataFrame({file: file_list.get(file)})
+                csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet 1', index_label='Index')
 
-
-def process_xlsx():
+def process_xlsx(mode):
     df = pd.read_excel('D:\\Downloads\\Date_CSV.xlsx', sheet_name='Sheet 1', index_col=0)
     col_names = df.columns.tolist()
     temp_file = []
@@ -59,8 +59,15 @@ def process_xlsx():
         elif 'Viteza' in name:
             viteza_file.extend(column_data)
 
-    for file in file_list:
-        if file_list.get(file):
-            df_file = pd.DataFrame({file: file_list.get(file)})
-            df_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet 1', index_label='Index')
+    if mode == 'CSV':
+        for file in file_list:
+            if file_list.get(file):
+                csv_file = pd.DataFrame({file: file_list.get(file)})
+                csv_file.to_csv(f'D:\\Downloads\\{file}.csv', index_label='Index')
+    elif mode == 'XLSX':
+        for file in file_list:
+            if file_list.get(file):
+                csv_file = pd.DataFrame({file: file_list.get(file)})
+                csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet 1', index_label='Index')
+
 
