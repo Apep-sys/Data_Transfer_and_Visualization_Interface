@@ -1,7 +1,10 @@
 import pandas as pd
 
-def process_csv(mode):
-    df = pd.read_csv('D:\\Downloads\\Date_CSV.csv')
+
+def process_csv(mode, path):
+
+    # TODO Modify the two functions to be a single one, depending on the file type given through the user Entry/Input
+    df = pd.read_csv(path)
     col_names = df.columns.tolist()
     temp_file = []
     umid_file = []
@@ -33,10 +36,10 @@ def process_csv(mode):
         for file in file_list:
             if file_list.get(file):
                 csv_file = pd.DataFrame({file: file_list.get(file)})
-                csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet 1', index_label='Index')
+                csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet1', index_label='Index')
 
 def process_xlsx(mode):
-    df = pd.read_excel('D:\\Downloads\\Date_CSV.xlsx', sheet_name='Sheet 1', index_col=0)
+    df = pd.read_excel('D:\\Downloads\\Date_CSV.xlsx', sheet_name='Sheet1', index_col=0)
     col_names = df.columns.tolist()
     temp_file = []
     umid_file = []
@@ -68,6 +71,6 @@ def process_xlsx(mode):
         for file in file_list:
             if file_list.get(file):
                 csv_file = pd.DataFrame({file: file_list.get(file)})
-                csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet 1', index_label='Index')
+                csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet1', index_label='Index')
 
 

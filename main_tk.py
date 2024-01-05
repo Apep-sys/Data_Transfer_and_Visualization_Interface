@@ -63,21 +63,30 @@ class TabView(ctk.CTkTabview):
 
     def read_tab(self):
         self.add('Read Tab')
-        self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
-                                     command=self.press_csv)
-        self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
-                                      command=self.press_xlsx)
-        self.btn_csv.pack(padx=10, pady=40)
-        self.btn_xlsx.pack(padx=10, pady=40)
+        self.entry = ctk.CTkEntry(self.tab('Read Tab'), placeholder_text='Name and Path of the File',
+                                  width=200)
+        self.entry.pack(padx=20, pady=10)
+        self.entry.bind('<Return>', self.entry_event)
 
-    def press_csv(self):
+    def entry_event(self, event):
+        self.entry.pack_forget()
+        if self.entry.get():
+            path = self.entry.get()
+            self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
+                                         command=lambda: self.press_csv(path))
+            self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
+                                          command=self.press_xlsx)
+            self.btn_csv.pack(padx=10, pady=40)
+            self.btn_xlsx.pack(padx=10, pady=40)
+
+    def press_csv(self, path):
         self.active_csv = True
         self.csv_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as CSV',
                                           corner_radius=32, font=('Roboto', 14),
-                                          command=ps.process_csv('CSV'))
+                                          command=lambda: ps.process_csv('CSV', path))
         self.csv_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as XLSX',
                                           corner_radius=32, font=('Roboto', 14),
-                                          command=ps.process_csv('XLSX'))
+                                          command=lambda: ps.process_xlsx('XLSX'))
         self.csv_csv.pack(padx=3, pady=10)
         self.csv_xlsx.pack(padx=3, pady=10)
 
@@ -90,10 +99,10 @@ class TabView(ctk.CTkTabview):
         self.active_xlsx = True
         self.xlsx_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as CSV',
                                           corner_radius=32, font=('Roboto', 14),
-                                          command=ps.process_csv('CSV'))
+                                          command=lambda: ps.process_csv('CSV'))
         self.xlsx_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as XLSX',
                                            corner_radius=32, font=('Roboto', 14),
-                                           command=ps.process_csv('XLSX'))
+                                           command=lambda: ps.process_xlsx('XLSX'))
         self.xlsx_csv.pack(padx=3, pady=10)
         self.xlsx_xlsx.pack(padx=3, pady=10)
 
