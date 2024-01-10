@@ -1,4 +1,5 @@
 from PIL import Image, ImageTk
 
-def show_graphs(master):
-    pass
+def show_graphs(param):
+    if 'Humidity' in param:
+        pass

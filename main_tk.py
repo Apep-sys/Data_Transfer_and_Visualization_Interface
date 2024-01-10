@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import parse_file as ps
+import graphs_file as gr
 
 
 class Frame(ctk.CTkFrame):
@@ -52,8 +53,6 @@ class Frame(ctk.CTkFrame):
 class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-        self.active_csv = False
-        self.active_xlsx = False
 
     def add(self, tab_name):
         tab = super().add(tab_name)
@@ -79,7 +78,6 @@ class TabView(ctk.CTkTabview):
             self.btn_xlsx.pack(padx=10, pady=40)
 
     def press_csv(self, path):
-        self.active_csv = True
         self.csv_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as CSV',
                                           corner_radius=32, font=('Roboto', 14),
                                           command=lambda: ps.process_csv('CSV', path, 'CSV'))
@@ -94,7 +92,6 @@ class TabView(ctk.CTkTabview):
 
 
     def press_xlsx(self, path):
-        self.active_xlsx = True
         self.xlsx_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as CSV',
                                           corner_radius=32, font=('Roboto', 14),
                                           command=lambda: ps.process_csv('XLSX', path, 'CSV'))
@@ -109,13 +106,13 @@ class TabView(ctk.CTkTabview):
 
 
     def graph_tab(self):
+        self.toplevel = None
         self.add('Graph Tab')
-        graph_names = ['Graph Humidity', 'Graph Temperature', 'Graph Speed', 'Graph Position']
-        for i in range(4):
-            self.btn = ctk.CTkButton(self.tab('Graph Tab'), text=graph_names[i], corner_radius=32)
+        graph_names = ['Graph Humidity', 'Graph Temperature', 'Graph Speed', 'Graph Presence', 'Graph All']
+        for i in range(5):
+            self.btn = ctk.CTkButton(self.tab('Graph Tab'), text=graph_names[i], corner_radius=32,
+                                     command=gr.show_graphs(graph_names[i]))
             self.btn.pack(padx=10, pady=20)
-
-
 
     def tcp_tab(self):
         self.add('TCP Tab')
@@ -162,10 +159,13 @@ class TabView(ctk.CTkTabview):
             elif 'All' in btn.cget('text'):
                 btn.configure(command=self.all_tab)
 
+
 class TopLevel(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.geometry('400x300')
+
+
 class App(ctk.CTk):
 
     def __init__(self):
