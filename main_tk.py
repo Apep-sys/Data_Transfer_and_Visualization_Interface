@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import parse_file as ps
-# from PIL import Image, ImageTk
 
 
 class Frame(ctk.CTkFrame):
@@ -75,7 +74,7 @@ class TabView(ctk.CTkTabview):
             self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
                                          command=lambda: self.press_csv(path))
             self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
-                                          command=self.press_xlsx)
+                                          command=lambda: self.press_xlsx(path))
             self.btn_csv.pack(padx=10, pady=40)
             self.btn_xlsx.pack(padx=10, pady=40)
 
@@ -83,33 +82,30 @@ class TabView(ctk.CTkTabview):
         self.active_csv = True
         self.csv_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as CSV',
                                           corner_radius=32, font=('Roboto', 14),
-                                          command=lambda: ps.process_csv('CSV', path))
+                                          command=lambda: ps.process_csv('CSV', path, 'CSV'))
         self.csv_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as XLSX',
                                           corner_radius=32, font=('Roboto', 14),
-                                          command=lambda: ps.process_xlsx('XLSX'))
+                                          command=lambda: ps.process_csv('CSV', path, 'XLSX'))
         self.csv_csv.pack(padx=3, pady=10)
         self.csv_xlsx.pack(padx=3, pady=10)
 
         self.btn_csv.pack_forget()
         self.btn_xlsx.pack_forget()
-        if self.active_xlsx is False:
-            self.btn_xlsx.pack(padx=10, pady=30)
 
-    def press_xlsx(self):
+
+    def press_xlsx(self, path):
         self.active_xlsx = True
         self.xlsx_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as CSV',
                                           corner_radius=32, font=('Roboto', 14),
-                                          command=lambda: ps.process_csv('CSV'))
+                                          command=lambda: ps.process_csv('XLSX', path, 'CSV'))
         self.xlsx_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as XLSX',
                                            corner_radius=32, font=('Roboto', 14),
-                                           command=lambda: ps.process_xlsx('XLSX'))
+                                           command=lambda: ps.process_csv('XLSX', path, 'XLSX'))
         self.xlsx_csv.pack(padx=3, pady=10)
         self.xlsx_xlsx.pack(padx=3, pady=10)
 
         self.btn_xlsx.pack_forget()
         self.btn_csv.pack_forget()
-        if self.active_csv is False:
-            self.btn_csv.pack(padx=10, pady=30)
 
 
     def graph_tab(self):
@@ -118,6 +114,8 @@ class TabView(ctk.CTkTabview):
         for i in range(4):
             self.btn = ctk.CTkButton(self.tab('Graph Tab'), text=graph_names[i], corner_radius=32)
             self.btn.pack(padx=10, pady=20)
+
+
 
     def tcp_tab(self):
         self.add('TCP Tab')
@@ -164,7 +162,10 @@ class TabView(ctk.CTkTabview):
             elif 'All' in btn.cget('text'):
                 btn.configure(command=self.all_tab)
 
-
+class TopLevel(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry('400x300')
 class App(ctk.CTk):
 
     def __init__(self):
