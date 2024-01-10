@@ -54,6 +54,9 @@ class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
+        self.toplevel_window = None
+        self.path = ''
+
     def add(self, tab_name):
         tab = super().add(tab_name)
         self.grid(column=0, row=5, padx=50)
@@ -69,11 +72,11 @@ class TabView(ctk.CTkTabview):
     def entry_event(self, event):
         self.entry.pack_forget()
         if self.entry.get():
-            path = self.entry.get()
+            self.path = self.entry.get()
             self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
-                                         command=lambda: self.press_csv(path))
+                                         command=lambda: self.press_csv(self.path))
             self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
-                                          command=lambda: self.press_xlsx(path))
+                                          command=lambda: self.press_xlsx(self.path))
             self.btn_csv.pack(padx=10, pady=40)
             self.btn_xlsx.pack(padx=10, pady=40)
 
@@ -90,7 +93,6 @@ class TabView(ctk.CTkTabview):
         self.btn_csv.pack_forget()
         self.btn_xlsx.pack_forget()
 
-
     def press_xlsx(self, path):
         self.xlsx_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as CSV',
                                           corner_radius=32, font=('Roboto', 14),
@@ -104,15 +106,20 @@ class TabView(ctk.CTkTabview):
         self.btn_xlsx.pack_forget()
         self.btn_csv.pack_forget()
 
-
     def graph_tab(self):
         self.toplevel = None
         self.add('Graph Tab')
-        graph_names = ['Graph Humidity', 'Graph Temperature', 'Graph Speed', 'Graph Presence', 'Graph All']
+        graph_names = ['Graph Temperature', 'Graph Humidity', 'Graph Speed', 'Graph Presence', 'Graph All']
         for i in range(5):
             self.btn = ctk.CTkButton(self.tab('Graph Tab'), text=graph_names[i], corner_radius=32,
                                      command=gr.show_graphs(graph_names[i]))
             self.btn.pack(padx=10, pady=20)
+
+    def open_toplevel(self):
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            self.toplevel_window = TopLevel(self)
+        else:
+            self.toplevel_window.focus()
 
     def tcp_tab(self):
         self.add('TCP Tab')

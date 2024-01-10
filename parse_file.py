@@ -24,7 +24,6 @@ def process_csv(type, path, mode):
         elif 'Viteza' in name:
             viteza_file.append(name)
 
-
     for file in file_list:
         if file_list.get(file):
             csv_file = df[file_list.get(file)]
