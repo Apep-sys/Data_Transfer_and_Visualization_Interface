@@ -108,23 +108,22 @@ class TabView(ctk.CTkTabview):
         self.btn_csv.pack_forget()
 
     def graph_tab(self):
-        self.toplevel = None
         self.add('Graph Tab')
         self.btn_temp = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Temperature', corner_radius=32,
                                       font=('Roboto', 14),
-                                      command=lambda: gr.show_graphs('Temp', self))
+                                      command=lambda: gr.show_graphs('Temp'))
         self.btn_humid = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Humidity', corner_radius=32,
                                       font=('Roboto', 14),
-                                      command=lambda: gr.show_graphs('Humid', self))
+                                      command=lambda: gr.show_graphs('Humid'))
         self.btn_speed = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Speed', corner_radius=32,
                                       font=('Roboto', 14),
-                                      command=lambda: gr.show_graphs('Speed', self))
+                                      command=lambda: gr.show_graphs('Speed'))
         self.btn_presence = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Presence', corner_radius=32,
                                       font=('Roboto', 14),
-                                      command=lambda: gr.show_graphs('Presence', self))
+                                      command=lambda: gr.show_graphs('Presence'))
         self.btn_all = ctk.CTkButton(self.tab('Graph Tab'), text='Graph All', corner_radius=32,
                                       font=('Roboto', 14),
-                                      command=lambda: gr.show_graphs('All', all))
+                                      command=lambda: gr.show_graphs('All'))
         self.btn_temp.pack(padx=3, pady=15)
         self.btn_humid.pack(padx=3, pady=15)
         self.btn_speed.pack(padx=3, pady=15)

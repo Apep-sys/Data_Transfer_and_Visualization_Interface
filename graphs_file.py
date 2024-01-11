@@ -1,9 +1,9 @@
-from PIL import Image
+from PIL import Image, ImageTk
 import pandas as pd
 from matplotlib import pyplot as plt
 import os
 import customtkinter as ctk
-
+from datetime import datetime
 
 class TopLevel(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -11,8 +11,9 @@ class TopLevel(ctk.CTkToplevel):
         self.geometry('600x400')
 
 
-def show_graphs(param, instance):
+def show_graphs(param):
     path = 'D:\\Downloads\\Graph Pictures'
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
 
     if 'Temp' in param:
         df = pd.read_csv('D:\\Downloads\\Temp.csv')
@@ -59,35 +60,35 @@ def show_graphs(param, instance):
             print(f'Directory {path} could not be created.')
 
     if 'Temp' in param:
-        path = path + '\\grafic_temperatura.png'
+        path = os.path.join(path, f'grafic_temperatura_{timestamp}.png')
         plt.savefig(path)
         temp_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        print(instance.toplevel_opened)
-        open_toplevel(instance, temp_img, param)
+        open_toplevel(temp_img)
 
     elif 'Humid' in param:
-        path = path + '\\grafic_umiditate.png'
+        path = os.path.join(path, f'grafic_umiditate_{timestamp}.png')
         plt.savefig(path)
         humid_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(instance.toplevel_window, humid_img, instance)
+        open_toplevel(humid_img)
 
     elif 'Speed' in param:
-        path = path + '\\grafic_viteza.png'
+        path = os.path.join(path, f'grafic_viteza_{timestamp}.png')
         plt.savefig(path)
+        print(path)
         speed_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(instance.toplevel_window, speed_img, instance)
+        open_toplevel(speed_img)
 
     elif 'Presence' in param:
-        path = path + '\\grafic_prezenta.png'
+        path = os.path.join(path, f'grafic_prezenta_{timestamp}.png')
         plt.savefig(path)
+        print(path)
         presence_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(instance.toplevel_window, presence_img, instance)
+        open_toplevel(presence_img)
 
-def open_toplevel(instance, img, param):
-    if not instance.toplevel_opened:
+def open_toplevel(img, toplevel_window=None):
+    if toplevel_window is None or toplevel_window.winfo_exists():
         toplevel_window = TopLevel()
-        instance.toplevel_opened = True
-        ctk.CTkLabel(toplevel_window, image=img ).grid(column=0, row=0)
+        ctk.CTkLabel(toplevel_window, image=img).grid(column=0, row=0)
     else:
-        instance.toplevel_window.focus()
+        toplevel_window.focus()
 
