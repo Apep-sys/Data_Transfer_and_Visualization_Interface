@@ -1,9 +1,17 @@
-from PIL import Image, ImageTk
+from PIL import Image
 import pandas as pd
 from matplotlib import pyplot as plt
 import os
+import customtkinter as ctk
 
-def show_graphs(param):
+
+class TopLevel(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry('600x400')
+
+
+def show_graphs(param, instance):
     path = 'D:\\Downloads\\Graph Pictures'
 
     if 'Temp' in param:
@@ -51,12 +59,35 @@ def show_graphs(param):
             print(f'Directory {path} could not be created.')
 
     if 'Temp' in param:
-        plt.savefig(path + '\\grafic_temperatura.png')
-    elif 'Humid' in param:
-        plt.savefig(path + '\\grafic_umiditate.png')
-    elif 'Speed' in param:
-        plt.savefig(path + '\\grafic_viteza.png')
-    elif 'Presence' in param:
-        plt.savefig(path + '\\grafic_prezenta.png')
+        path = path + '\\grafic_temperatura.png'
+        plt.savefig(path)
+        temp_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
+        print(instance.toplevel_opened)
+        open_toplevel(instance, temp_img, param)
 
+    elif 'Humid' in param:
+        path = path + '\\grafic_umiditate.png'
+        plt.savefig(path)
+        humid_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
+        open_toplevel(instance.toplevel_window, humid_img, instance)
+
+    elif 'Speed' in param:
+        path = path + '\\grafic_viteza.png'
+        plt.savefig(path)
+        speed_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
+        open_toplevel(instance.toplevel_window, speed_img, instance)
+
+    elif 'Presence' in param:
+        path = path + '\\grafic_prezenta.png'
+        plt.savefig(path)
+        presence_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
+        open_toplevel(instance.toplevel_window, presence_img, instance)
+
+def open_toplevel(instance, img, param):
+    if not instance.toplevel_opened:
+        toplevel_window = TopLevel()
+        instance.toplevel_opened = True
+        ctk.CTkLabel(toplevel_window, image=img ).grid(column=0, row=0)
+    else:
+        instance.toplevel_window.focus()
 
