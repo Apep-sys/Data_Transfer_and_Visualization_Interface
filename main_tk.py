@@ -121,15 +121,11 @@ class TabView(ctk.CTkTabview):
         self.btn_presence = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Presence', corner_radius=32,
                                       font=('Roboto', 14),
                                       command=lambda: gr.show_graphs('Presence'))
-        self.btn_all = ctk.CTkButton(self.tab('Graph Tab'), text='Graph All', corner_radius=32,
-                                      font=('Roboto', 14),
-                                      command=lambda: gr.show_graphs('All'))
+
         self.btn_temp.pack(padx=3, pady=15)
         self.btn_humid.pack(padx=3, pady=15)
         self.btn_speed.pack(padx=3, pady=15)
         self.btn_presence.pack(padx=3, pady=15)
-        self.btn_all.pack(padx=3, pady=15)
-
 
     def tcp_tab(self):
         self.add('TCP Tab')
@@ -214,4 +210,3 @@ if __name__ == '__main__':
     app = App(root)
     app.intro()
     app.mainloop()
-    root.destroy()

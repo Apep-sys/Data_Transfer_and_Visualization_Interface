@@ -1,8 +1,9 @@
-from PIL import Image, ImageTk
+from PIL import Image
 import pandas as pd
 from matplotlib import pyplot as plt
 import os
 import customtkinter as ctk
+
 
 class TopLevel(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -10,9 +11,11 @@ class TopLevel(ctk.CTkToplevel):
         self.geometry('600x400')
 
 
-def show_graphs(param):
-    path = 'D:\\Downloads\\Graph Pictures'
+toplevel_open = {'Temp': None, 'Humid': None, 'Speed': None, 'Presence': None}
 
+
+def show_graphs(param, toplevel_open=toplevel_open):
+    path = 'D:\\Downloads\\Graph Pictures'
     if 'Temp' in param:
         df = pd.read_csv('D:\\Downloads\\Temp.csv')
         plt.xlabel('Index')
@@ -41,7 +44,7 @@ def show_graphs(param):
     col_names = df.columns.tolist()
     index_x = df['Index'].tolist()
 
-    for index, name in enumerate(col_names[1:]):
+    for name in col_names[1:]:
         data = df[name].tolist()
         temp_data[name] = data
 
@@ -57,44 +60,28 @@ def show_graphs(param):
         except OSError as error:
             print(f'Directory {path} could not be created.')
 
-    toplevel_window = None
-
-    if 'Temp' in param:
-        path = os.path.join(path, f'grafic_temperatura.png')
-        plt.savefig(path)
-        temp_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(temp_img, toplevel_window)
-        plt.clf()
-
-    elif 'Humid' in param:
-        path = os.path.join(path, f'grafic_umiditate.png')
-        plt.savefig(path)
-        humid_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(humid_img)
-        plt.clf()
-
-    elif 'Speed' in param:
-        path = os.path.join(path, f'grafic_viteza.png')
-        plt.savefig(path)
-        speed_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(speed_img)
-        plt.clf()
-
-    elif 'Presence' in param:
-        path = os.path.join(path, f'grafic_prezenta.png')
-        plt.savefig(path)
-        presence_img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
-        open_toplevel(presence_img)
-        plt.clf()
+    path = os.path.join(path, f'grafic_{param.lower()}.png')
+    plt.savefig(path)
+    img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
+    open_toplevel(img, toplevel_open, param)
+    plt.clf()
 
 
-def open_toplevel(img, toplevel_window=None):
-    if toplevel_window is None or toplevel_window.winfo_exists():
-        toplevel_window = TopLevel()
-        ctk.CTkLabel(toplevel_window, image=img).grid(column=0, row=0)
-        toplevel_window = True
-        return toplevel_window
+def open_toplevel(img, toplevel_open, param):
+    if not toplevel_open[param]:
+        toplevel_open[param] = TopLevel()
+        toplevel_x = 900
+        toplevel_y = 200
+        toplevel_width = 600
+        toplevel_height = 400
+
+        # Setam geometria ferestrei TopLevel deschise
+        toplevel_open[param].geometry(f'{toplevel_width}x{toplevel_height}+{toplevel_x}+{toplevel_y}')
+
+        ctk.CTkLabel(toplevel_open[param], image=img).grid(column=0, row=0)
+
 
     else:
-        toplevel_window.focus()
+        toplevel_open[param].lift()  # Aduce fereastra in fata
+        toplevel_open[param].focus_force() # Forteaza ca focusul sa fie pe fereastra deschisa, la fiecare apasare de buton
 
