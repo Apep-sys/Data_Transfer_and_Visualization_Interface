@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import parse_file as ps
 import graphs_file as gr
-
+import sys
 
 class Frame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -74,12 +74,14 @@ class TabView(ctk.CTkTabview):
         self.entry.pack_forget()
         if self.entry.get():
             self.path = self.entry.get()
-            self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
-                                         command=lambda: self.press_csv(self.path))
-            self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
-                                          command=lambda: self.press_xlsx(self.path))
-            self.btn_csv.pack(padx=10, pady=40)
-            self.btn_xlsx.pack(padx=10, pady=40)
+            if self.path[-3:] == 'csv':
+                self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
+                                             command=lambda: self.press_csv(self.path))
+                self.btn_csv.pack(padx=10, pady=40)
+            elif self.path[-3:] == 'lsx':
+                self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
+                                              command=lambda: self.press_xlsx(self.path))
+                self.btn_xlsx.pack(padx=10, pady=40)
 
     def press_csv(self, path):
         self.csv_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download CSV as CSV',
@@ -92,7 +94,6 @@ class TabView(ctk.CTkTabview):
         self.csv_xlsx.pack(padx=3, pady=10)
 
         self.btn_csv.pack_forget()
-        self.btn_xlsx.pack_forget()
 
     def press_xlsx(self, path):
         self.xlsx_csv = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as CSV',
@@ -101,11 +102,10 @@ class TabView(ctk.CTkTabview):
         self.xlsx_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Download XLSX as XLSX',
                                            corner_radius=32, font=('Roboto', 14),
                                            command=lambda: ps.process_csv('XLSX', path, 'XLSX'))
-        self.xlsx_csv.pack(padx=3, pady=10)
-        self.xlsx_xlsx.pack(padx=3, pady=10)
 
         self.btn_xlsx.pack_forget()
-        self.btn_csv.pack_forget()
+        self.xlsx_csv.pack(padx=3, pady=10)
+        self.xlsx_xlsx.pack(padx=3, pady=10)
 
     def graph_tab(self):
         self.add('Graph Tab')
@@ -178,12 +178,21 @@ class TabView(ctk.CTkTabview):
 
 class App(ctk.CTk):
 
-    def __init__(self):
+    def __init__(self, root):
         super().__init__()
+        self.root = root
         self.geometry('800x500')
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
         self.grid_columnconfigure(0, weight=1, minsize=50)
+        self.setup()
+
+    def setup(self):
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.root.destroy()
+        sys.exit()
 
     def intro(self):
         self.lbl_frame = Frame(self, border_width=2, border_color='red')
@@ -200,7 +209,9 @@ class App(ctk.CTk):
         self.tab_view.add_command(self.btn_list)
 
 
-app = App()
-app.intro()
-
-app.mainloop()
+if __name__ == '__main__':
+    root = ctk.CTk()
+    app = App(root)
+    app.intro()
+    app.mainloop()
+    root.destroy()
