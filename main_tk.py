@@ -1,6 +1,10 @@
+import threading
+
 import customtkinter as ctk
 import parse_file as ps
 import graphs_file as gr
+import tcp_file as tcp
+import queue
 import sys
 
 class Frame(ctk.CTkFrame):
@@ -53,8 +57,8 @@ class Frame(ctk.CTkFrame):
 class TabView(ctk.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.master = master
 
-        self.toplevel_window = None
         self.path = ''
         self.toplevel_opened = False
 
@@ -131,9 +135,11 @@ class TabView(ctk.CTkTabview):
         self.add('TCP Tab')
 
         # TODO To add the red colour for closing buttons
-        self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32)
+        self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,
+                                      command=lambda: self.master.threads(thread='tcp'))
 
-        self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32)
+        self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32,
+                                       command=lambda: self.master.threads(stop='stop'))
         self.open_tcp.pack(padx=10, pady=20)
         self.close_tcp.pack(padx=10, pady=20)
 
@@ -177,10 +183,16 @@ class App(ctk.CTk):
     def __init__(self, root):
         super().__init__()
         self.root = root
+
         self.geometry('800x500')
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
         self.grid_columnconfigure(0, weight=1, minsize=50)
+
+        self.q = queue.Queue()
+        self.p = queue.Queue()
+        self.thread_list = []
+
         self.setup()
 
     def setup(self):
@@ -203,6 +215,29 @@ class App(ctk.CTk):
     def tabs(self):
         self.tab_view = TabView(self, corner_radius=32, fg_color='silver')
         self.tab_view.add_command(self.btn_list)
+
+    def threads(self, thread=None, stop=None):
+
+        if stop == 'stop':
+            self.thread_list = []
+            print('Emptied.')
+
+        if thread == 'tcp':
+            tcp_thread = threading.Thread(target=tcp.serverTCP, name='TCP Thread')
+            self.thread_list.append(tcp_thread)
+        elif thread == 'arduino':
+            #TODO To be added in a future arduino file
+            arduino_thread = threading.Thread()
+            self.thread_list.append(arduino_thread)
+        elif thread == 'all':
+            pass
+            # all of the above
+        for thread in self.thread_list:
+            thread.start()
+
+        for thread in self.thread_list:
+            thread.join()
+        print('Thread finished')
 
 
 if __name__ == '__main__':
