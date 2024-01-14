@@ -197,12 +197,12 @@ class App(ctk.CTk):
         ctk.set_default_color_theme('dark-blue')
         self.grid_columnconfigure(0, weight=1, minsize=50)
 
+        self.arduino_thread = None
+        self.tcp_thread = None
         self.stop_event_arduino = threading.Event()
         self.stop_event_tcp = threading.Event()
         self.q = queue.Queue()
         self.p = queue.Queue()
-        self.arduino_thread = None
-        self.tcp_thread = None
 
         self.setup()
 
@@ -232,15 +232,13 @@ class App(ctk.CTk):
         if thread == 'arduino':
             self.arduino_thread = threading.Thread(target=ardu.arduino, args=(stop_event, q, p),
                                                    name='Arduino Thread')
+            self.arduino_thread.daemon = True
             self.arduino_thread.start()
 
-            '''elif stop is True:
-                self.arduino_thread = threading.Thread(target=ardu.arduino(stop=stop))'''
-
-
         elif thread == 'tcp':
-            tcp_thread = threading.Thread(target=tcp.serverTCP, args=(stop_event, q), name='TCP Thread')
-            tcp_thread.start()
+            self.tcp_thread = threading.Thread(target=tcp.serverTCP, args=(stop_event, q), name='TCP Thread')
+            self.tcp_thread.daemon = True
+            self.tcp_thread.start()
 
         elif thread == 'all':
             pass

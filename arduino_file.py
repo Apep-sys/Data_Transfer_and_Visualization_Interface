@@ -17,16 +17,6 @@ def arduino(stop_event=None, q=None, p=None):
         q.put(data)
         p.put(data)
 
-
-
-    '''if stop is None:
-        print('Connected!')
-
-        for i in range(50):
-            data = arduino.readline()
-            q.put(data)
-            p.put(data)
-
-    elif stop is True:
+    if arduino.isOpen():
         arduino.close()
-        print('Arduino thread has closed.')'''
+        print('Arduino thread has closed.')
