@@ -32,6 +32,21 @@ def process_csv(type, path, mode):
         elif mode == 'XLSX':
                 csv_file.to_excel(f'D:\\Downloads\\{file}.xlsx', sheet_name='Sheet1', index_label='Index')
 
+def create_csv(p):
+    data_list = []
+
+    for i in range(50):
+        data = p.get()
+        data = data.decode('utf-8', errors='ignore')
+
+        if data:
+            data_list.append([i, data])
+
+    df = pd.DataFrame(data_list, columns=['Index', 'Data'])
+
+    # Append to the CSV file
+    df.to_csv(r'D:\Downloads\Date_Microcontroller.csv', mode='a', header=False, index=False)
+
 
 
 

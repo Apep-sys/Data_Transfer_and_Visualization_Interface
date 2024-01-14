@@ -1,5 +1,4 @@
 import threading
-
 import customtkinter as ctk
 import parse_file as ps
 import graphs_file as gr
@@ -15,7 +14,7 @@ class Frame(ctk.CTkFrame):
 
     def add_btns(self):
         btn_names = ['Read CSV/XLSX', 'Graph the Data', 'RS232 Communication', 'Send to TCP',
-                     'All of the Above', 'Close Application']
+                     'Real-Time Reading', 'Close Application']
         btn_list = []
 
         for i in range(6):
@@ -31,8 +30,7 @@ class Frame(ctk.CTkFrame):
         self.grid(row=0, column=0, padx=20, pady=50, sticky='nsew')
         self.lbl = ctk.CTkLabel(self, text='\n\n\nWelcome to my project!\nInstructions:\n1. Choose your theme\n'
                                            '2. Click the Start button and select the desired operation\n'
-                                           '', font=('Roboto', 20),
-                                text_color='green')
+                                           '', font=('Roboto', 20), text_color='green')
         self.btn = ctk.CTkButton(self, text='Start', width=70, height=50, border_width=2, border_color='green',
                                  corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
         self.theme_btn = ctk.CTkButton(self, text='Change the Theme', width=70, height=50, border_width=2,
@@ -135,14 +133,14 @@ class TabView(ctk.CTkTabview):
     def tcp_tab(self):
         self.add('TCP Tab')
 
-        #TODO To add the red colour for closing buttons
         self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,
                                       command=lambda: self.master.threads(thread='tcp', q=self.master.q,
                                                                           stop_event=self.master.stop_event_tcp))
 
-        self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32,
+        self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32, fg_color='red',
+                                       hover_color='red',
                                        command=lambda: self.master.stop_threads(thread='tcp',
-                                                                           stop_event=self.master.stop_event_tcp))
+                                                                                stop_event=self.master.stop_event_tcp))
         self.open_tcp.pack(padx=10, pady=20)
         self.close_tcp.pack(padx=10, pady=20)
 
@@ -153,22 +151,30 @@ class TabView(ctk.CTkTabview):
                                                                          p=self.master.p,
                                                                          stop_event=self.master.stop_event_arduino))
         self.rs_close = ctk.CTkButton(self.tab('RS232 Tab'), text='Close RS Communication', corner_radius=32,
+                                      fg_color='red', hover_color='red',
                                      command=lambda: self.master.stop_threads(thread='arduino',
-                                                                              stop_event=self.master.stop_event_arduino))
+                                                                         stop_event=self.master.stop_event_arduino))
         self.rs_open.pack(padx=10, pady=20)
         self.rs_close.pack(padx=10, pady=20)
 
     def all_tab(self):
-        self.add('All Tab')
-        self.btn = ctk.CTkButton(self.tab('All Tab'), text='Execute Command', corner_radius=32)
-        self.btn.pack(padx=10, pady=20)
+        self.add('Live Graph')
+        self.arduino_btn = ctk.CTkButton(self.tab('Live Graph'), text='Get data from microcontroller', corner_radius=32,
+                                 command=lambda: self.master.threads(thread='arduino', q=self.master.q,
+                                                                     p=self.master.p,
+                                                                     stop_event=self.master.stop_event_arduino))
+        self.arduino_btn.pack(padx=10, pady=20)
+
+        self.csv_btn = ctk.CTkButton(self.tab('Live Graph'), text='Save data in CSV', corner_radius=32,
+                                 command=lambda: self.master.threads(thread='csv', p=self.master.p))
+        self.csv_btn.pack(padx=10, pady=20)
 
     def close_tab(self):
         self.add('Close Tab')
 
     def add_command(self, btn_list):
         for btn in btn_list:
-            if 'Read' in btn.cget('text'):
+            if 'Read CSV' in btn.cget('text'):
                 btn.configure(command=self.read_tab)
 
             elif 'Close' in btn.cget('text'):
@@ -183,7 +189,7 @@ class TabView(ctk.CTkTabview):
             elif 'RS232' in btn.cget('text'):
                 btn.configure(command=self.rs232_tab)
 
-            elif 'All' in btn.cget('text'):
+            elif 'Real-Time' in btn.cget('text'):
                 btn.configure(command=self.all_tab)
 
 class App(ctk.CTk):
@@ -199,8 +205,11 @@ class App(ctk.CTk):
 
         self.arduino_thread = None
         self.tcp_thread = None
+        self.csv_thread = None
+
         self.stop_event_arduino = threading.Event()
         self.stop_event_tcp = threading.Event()
+
         self.q = queue.Queue()
         self.p = queue.Queue()
 
@@ -240,15 +249,16 @@ class App(ctk.CTk):
             self.tcp_thread.daemon = True
             self.tcp_thread.start()
 
-        elif thread == 'all':
-            pass
-            # all of the above
+        elif thread == 'csv':
+            self.csv_thread = threading.Thread(target=ps.create_csv, args=(p,), name='CSV Thread')
+            self.csv_thread.daemon = True
+            self.csv_thread.start()
 
     def stop_threads(self, stop_event, thread):
         if thread == 'arduino':
             stop_event.set()
             self.arduino_thread.join()
-        elif thread== 'tcp':
+        elif thread == 'tcp':
             stop_event.set()
             self.tcp_thread.join()
 

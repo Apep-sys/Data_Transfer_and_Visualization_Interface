@@ -1,8 +1,11 @@
 from PIL import Image
 import pandas as pd
 from matplotlib import pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
 import os
 import customtkinter as ctk
+
 
 
 class TopLevel(ctk.CTkToplevel):
@@ -83,8 +86,6 @@ def open_toplevel(img, toplevel_open, param):
         toplevel_open[param].geometry(f'{toplevel_width}x{toplevel_height}+{toplevel_x}+{toplevel_y}')
 
         ctk.CTkLabel(toplevel_open[param], image=img).grid(column=0, row=0)
-
-
     else:
         toplevel_open[param].lift()  # Aduce fereastra in fata
         toplevel_open[param].focus_force() # Forteaza ca focusul sa fie pe fereastra deschisa, la fiecare apasare de buton

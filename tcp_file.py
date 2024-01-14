@@ -7,9 +7,11 @@ def serverTCP(stop_event=None, q=None):
     serversocket.bind((host, port))
     serversocket.listen(5)
 
+    print('TCP thread started!')
+    serversocket.settimeout(1)
+
     while not stop_event.is_set():
         if not q.empty():
-            print('TCP thread started!')
             for i in range(50):
                 data = q.get()
                 data = data.decode('utf-8', errors='ignore')
