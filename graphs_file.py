@@ -69,11 +69,15 @@ def show_graphs(param, toplevel_open=toplevel_open):
 
 def open_toplevel(img, toplevel_open, param):
     if not toplevel_open[param]:
+
+        #TODO Rename the toplevel's titles.
         toplevel_open[param] = TopLevel()
+
         toplevel_x = 900
         toplevel_y = 200
         toplevel_width = 600
         toplevel_height = 400
+        #TODO Could add taking the app's window geometry characteristics to update properly in case of resizing.
 
         # Setam geometria ferestrei TopLevel deschise
         toplevel_open[param].geometry(f'{toplevel_width}x{toplevel_height}+{toplevel_x}+{toplevel_y}')

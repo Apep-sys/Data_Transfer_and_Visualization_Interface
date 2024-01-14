@@ -4,6 +4,7 @@ import customtkinter as ctk
 import parse_file as ps
 import graphs_file as gr
 import tcp_file as tcp
+import arduino_file as ardu
 import queue
 import sys
 
@@ -13,7 +14,7 @@ class Frame(ctk.CTkFrame):
         self.master = master
 
     def add_btns(self):
-        btn_names = ['Read CSV/XLSX', 'Graph the Data', 'Send to TCP', 'RS232 Communication',
+        btn_names = ['Read CSV/XLSX', 'Graph the Data', 'RS232 Communication', 'Send to TCP',
                      'All of the Above', 'Close Application']
         btn_list = []
 
@@ -134,19 +135,26 @@ class TabView(ctk.CTkTabview):
     def tcp_tab(self):
         self.add('TCP Tab')
 
-        # TODO To add the red colour for closing buttons
+        #TODO To add the red colour for closing buttons
         self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,
-                                      command=lambda: self.master.threads(thread='tcp'))
+                                      command=lambda: self.master.threads(thread='tcp', q=self.master.q,
+                                                                          stop_event=self.master.stop_event_tcp))
 
         self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32,
-                                       command=lambda: self.master.threads(stop='stop'))
+                                       command=lambda: self.master.stop_threads(thread='tcp',
+                                                                           stop_event=self.master.stop_event_tcp))
         self.open_tcp.pack(padx=10, pady=20)
         self.close_tcp.pack(padx=10, pady=20)
 
     def rs232_tab(self):
         self.add('RS232 Tab')
-        self.rs_open = ctk.CTkButton(self.tab('RS232 Tab'), text='Start RS Communication', corner_radius=32)
-        self.rs_close = ctk.CTkButton(self.tab('RS232 Tab'), text='Close RS Communication', corner_radius=32)
+        self.rs_open = ctk.CTkButton(self.tab('RS232 Tab'), text='Start RS Communication', corner_radius=32,
+                                     command=lambda: self.master.threads(thread='arduino', q=self.master.q,
+                                                                         p=self.master.p,
+                                                                         stop_event=self.master.stop_event_arduino))
+        self.rs_close = ctk.CTkButton(self.tab('RS232 Tab'), text='Close RS Communication', corner_radius=32,
+                                     command=lambda: self.master.stop_threads(thread='arduino',
+                                                                              stop_event=self.master.stop_event_arduino))
         self.rs_open.pack(padx=10, pady=20)
         self.rs_close.pack(padx=10, pady=20)
 
@@ -189,9 +197,12 @@ class App(ctk.CTk):
         ctk.set_default_color_theme('dark-blue')
         self.grid_columnconfigure(0, weight=1, minsize=50)
 
+        self.stop_event_arduino = threading.Event()
+        self.stop_event_tcp = threading.Event()
         self.q = queue.Queue()
         self.p = queue.Queue()
-        self.thread_list = []
+        self.arduino_thread = None
+        self.tcp_thread = None
 
         self.setup()
 
@@ -216,28 +227,35 @@ class App(ctk.CTk):
         self.tab_view = TabView(self, corner_radius=32, fg_color='silver')
         self.tab_view.add_command(self.btn_list)
 
-    def threads(self, thread=None, stop=None):
+    def threads(self, stop_event=None, thread=None, q=None, p=None):
 
-        if stop == 'stop':
-            self.thread_list = []
-            print('Emptied.')
+        if thread == 'arduino':
+            self.arduino_thread = threading.Thread(target=ardu.arduino, args=(stop_event, q, p),
+                                                   name='Arduino Thread')
+            self.arduino_thread.start()
 
-        if thread == 'tcp':
-            tcp_thread = threading.Thread(target=tcp.serverTCP, name='TCP Thread')
-            self.thread_list.append(tcp_thread)
-        elif thread == 'arduino':
-            #TODO To be added in a future arduino file
-            arduino_thread = threading.Thread()
-            self.thread_list.append(arduino_thread)
+            '''elif stop is True:
+                self.arduino_thread = threading.Thread(target=ardu.arduino(stop=stop))'''
+
+
+        elif thread == 'tcp':
+            tcp_thread = threading.Thread(target=tcp.serverTCP, args=(stop_event, q), name='TCP Thread')
+            tcp_thread.start()
+
         elif thread == 'all':
             pass
             # all of the above
-        for thread in self.thread_list:
-            thread.start()
 
-        for thread in self.thread_list:
-            thread.join()
-        print('Thread finished')
+    def stop_threads(self, stop_event, thread):
+        if thread == 'arduino':
+            stop_event.set()
+            self.arduino_thread.join()
+        elif thread== 'tcp':
+            stop_event.set()
+            self.tcp_thread.join()
+
+
+
 
 
 if __name__ == '__main__':
@@ -245,3 +263,4 @@ if __name__ == '__main__':
     app = App(root)
     app.intro()
     app.mainloop()
+    sys.exit()
