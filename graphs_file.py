@@ -1,11 +1,8 @@
 from PIL import Image
+import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib import pyplot as plt
-import matplotlib.animation as animation
-from matplotlib import style
 import os
 import customtkinter as ctk
-
 
 
 class TopLevel(ctk.CTkToplevel):
@@ -14,7 +11,7 @@ class TopLevel(ctk.CTkToplevel):
         self.geometry('600x400')
 
 
-toplevel_open = {'Temp': None, 'Humid': None, 'Speed': None, 'Presence': None}
+toplevel_open = {'Temp': None, 'Humid': None, 'Speed': None, 'Presence': None, 'Live Graph': None}
 
 
 def show_graphs(param, toplevel_open=toplevel_open):
@@ -71,6 +68,7 @@ def show_graphs(param, toplevel_open=toplevel_open):
 
 
 def open_toplevel(img, toplevel_open, param):
+
     if not toplevel_open[param]:
 
         #TODO Rename the toplevel's titles.
@@ -85,7 +83,7 @@ def open_toplevel(img, toplevel_open, param):
         # Setam geometria ferestrei TopLevel deschise
         toplevel_open[param].geometry(f'{toplevel_width}x{toplevel_height}+{toplevel_x}+{toplevel_y}')
 
-        ctk.CTkLabel(toplevel_open[param], image=img).grid(column=0, row=0)
+        ctk.CTkLabel(toplevel_open[param], text='', image=img).grid(column=0, row=0)
     else:
         toplevel_open[param].lift()  # Aduce fereastra in fata
         toplevel_open[param].focus_force() # Forteaza ca focusul sa fie pe fereastra deschisa, la fiecare apasare de buton

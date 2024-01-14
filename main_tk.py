@@ -4,6 +4,7 @@ import parse_file as ps
 import graphs_file as gr
 import tcp_file as tcp
 import arduino_file as ardu
+import live_graph as live
 import queue
 import sys
 
@@ -159,15 +160,19 @@ class TabView(ctk.CTkTabview):
 
     def all_tab(self):
         self.add('Live Graph')
-        self.arduino_btn = ctk.CTkButton(self.tab('Live Graph'), text='Get data from microcontroller', corner_radius=32,
+        self.arduino_btn = ctk.CTkButton(self.tab('Live Graph'), text='Get Data from Microcontroller', corner_radius=32,
                                  command=lambda: self.master.threads(thread='arduino', q=self.master.q,
                                                                      p=self.master.p,
                                                                      stop_event=self.master.stop_event_arduino))
         self.arduino_btn.pack(padx=10, pady=20)
 
-        self.csv_btn = ctk.CTkButton(self.tab('Live Graph'), text='Save data in CSV', corner_radius=32,
+        self.csv_btn = ctk.CTkButton(self.tab('Live Graph'), text='Save Data in CSV', corner_radius=32,
                                  command=lambda: self.master.threads(thread='csv', p=self.master.p))
         self.csv_btn.pack(padx=10, pady=20)
+
+        self.live_graph_btn = ctk.CTkButton(self.tab('Live Graph'), text='Live Graph', corner_radius=32,
+                                 command=lambda: self.master.threads(thread='live'))
+        self.live_graph_btn.pack(padx=10, pady=20)
 
     def close_tab(self):
         self.add('Close Tab')
@@ -206,6 +211,7 @@ class App(ctk.CTk):
         self.arduino_thread = None
         self.tcp_thread = None
         self.csv_thread = None
+        self.live_graph_thread = None
 
         self.stop_event_arduino = threading.Event()
         self.stop_event_tcp = threading.Event()
@@ -236,6 +242,7 @@ class App(ctk.CTk):
         self.tab_view = TabView(self, corner_radius=32, fg_color='silver')
         self.tab_view.add_command(self.btn_list)
 
+
     def threads(self, stop_event=None, thread=None, q=None, p=None):
 
         if thread == 'arduino':
@@ -254,6 +261,12 @@ class App(ctk.CTk):
             self.csv_thread.daemon = True
             self.csv_thread.start()
 
+        elif thread == 'live':
+            self.live_graph_thread = threading.Thread(target=live.start_animation(), name='Live Graph')
+            self.live_graph_thread.daemon = True
+            self.live_graph_thread.start()
+
+
     def stop_threads(self, stop_event, thread):
         if thread == 'arduino':
             stop_event.set()
@@ -261,8 +274,6 @@ class App(ctk.CTk):
         elif thread == 'tcp':
             stop_event.set()
             self.tcp_thread.join()
-
-
 
 
 

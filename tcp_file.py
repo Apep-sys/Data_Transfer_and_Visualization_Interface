@@ -1,5 +1,5 @@
 import socket
-import time
+
 def serverTCP(stop_event=None, q=None):
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = 'localhost'

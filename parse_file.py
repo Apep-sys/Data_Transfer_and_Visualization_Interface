@@ -35,6 +35,7 @@ def process_csv(type, path, mode):
 def create_csv(p):
     data_list = []
 
+    print('CSV thread has started!')
     for i in range(50):
         data = p.get()
         data = data.decode('utf-8', errors='ignore')
@@ -45,7 +46,8 @@ def create_csv(p):
     df = pd.DataFrame(data_list, columns=['Index', 'Data'])
 
     # Append to the CSV file
-    df.to_csv(r'D:\Downloads\Date_Microcontroller.csv', mode='a', header=False, index=False)
+    df.to_csv(r'D:\Downloads\Date_Microcontroller.csv', mode='a', header=False, index=False, index_label='Index')
+    print('CSV Thread has closed.')
 
 
 

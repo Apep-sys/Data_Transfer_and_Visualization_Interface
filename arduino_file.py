@@ -1,7 +1,8 @@
 import serial
+import time
 
 def arduino(stop_event=None, q=None, p=None):
-    arduino = serial.Serial('COM3', baudrate=9600, timeout=.1)
+    arduino = serial.Serial('COM3', baudrate=9600, timeout=0.5)
     print('Arduino thread has started!')
     for i in range(50):
 
