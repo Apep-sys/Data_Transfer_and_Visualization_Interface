@@ -80,10 +80,12 @@ class TabView(ctk.CTkTabview):
             self.path = self.entry.get()
             if self.path[-3:] == 'csv':
                 self.btn_csv = ctk.CTkButton(self.tab('Read Tab'), text='Read CSV', corner_radius=32,
+                                             font=('Roboto', 14),
                                              command=lambda: self.press_csv(self.path))
                 self.btn_csv.pack(padx=10, pady=40)
             elif self.path[-3:] == 'lsx':
                 self.btn_xlsx = ctk.CTkButton(self.tab('Read Tab'), text='Read XLSX', corner_radius=32,
+                                              font=('Roboto', 14),
                                               command=lambda: self.press_xlsx(self.path))
                 self.btn_xlsx.pack(padx=10, pady=40)
 
@@ -134,12 +136,12 @@ class TabView(ctk.CTkTabview):
     def tcp_tab(self):
         self.add('TCP Tab')
 
-        self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,
+        self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,font=('Roboto', 14),
                                       command=lambda: self.master.threads(thread='tcp', q=self.master.q,
                                                                           stop_event=self.master.stop_event_tcp))
 
         self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32, fg_color='red',
-                                       hover_color='red',
+                                       hover_color='red', font=('Roboto', 14),
                                        command=lambda: self.master.stop_threads(thread='tcp',
                                                                                 stop_event=self.master.stop_event_tcp))
         self.open_tcp.pack(padx=10, pady=20)
@@ -149,11 +151,11 @@ class TabView(ctk.CTkTabview):
         self.add('RS232 Tab')
         self.rs_open = ctk.CTkButton(self.tab('RS232 Tab'), text='Start RS Communication', corner_radius=32,
                                      command=lambda: self.master.threads(thread='arduino', q=self.master.q,
-                                                                         p=self.master.p,
+                                                                         font=('Roboto', 14), p=self.master.p,
                                                                          stop_event=self.master.stop_event_arduino))
         self.rs_close = ctk.CTkButton(self.tab('RS232 Tab'), text='Close RS Communication', corner_radius=32,
                                       fg_color='red', hover_color='red',
-                                     command=lambda: self.master.stop_threads(thread='arduino',
+                                     command=lambda: self.master.stop_threads(thread='arduino',font=('Roboto', 14),
                                                                          stop_event=self.master.stop_event_arduino))
         self.rs_open.pack(padx=10, pady=20)
         self.rs_close.pack(padx=10, pady=20)
@@ -162,16 +164,18 @@ class TabView(ctk.CTkTabview):
         self.add('Live Graph')
         self.arduino_btn = ctk.CTkButton(self.tab('Live Graph'), text='Get Data from Microcontroller', corner_radius=32,
                                  command=lambda: self.master.threads(thread='arduino', q=self.master.q,
-                                                                     p=self.master.p,
+                                                                     p=self.master.p, font=('Roboto', 14),
                                                                      stop_event=self.master.stop_event_arduino))
         self.arduino_btn.pack(padx=10, pady=20)
 
         self.csv_btn = ctk.CTkButton(self.tab('Live Graph'), text='Save Data in CSV', corner_radius=32,
-                                 command=lambda: self.master.threads(thread='csv', p=self.master.p))
+                                                                    font=('Roboto', 14),
+                                                                    command=lambda: self.master.threads(thread='csv', p=self.master.p))
         self.csv_btn.pack(padx=10, pady=20)
 
         self.live_graph_btn = ctk.CTkButton(self.tab('Live Graph'), text='Live Graph', corner_radius=32,
-                                 command=lambda: self.master.threads(thread='live'))
+                                                                    font=('Roboto', 14),
+                                                                    command=lambda: self.master.threads(thread='live'))
         self.live_graph_btn.pack(padx=10, pady=20)
 
     def close_tab(self):
@@ -282,4 +286,3 @@ if __name__ == '__main__':
     app = App(root)
     app.intro()
     app.mainloop()
-    sys.exit()
