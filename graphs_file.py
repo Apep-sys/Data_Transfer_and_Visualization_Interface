@@ -4,17 +4,35 @@ import pandas as pd
 import os
 import customtkinter as ctk
 
+'''Fisierul care contine clase si metode relevante pentru generarea graficelor.'''
 
 class TopLevel(ctk.CTkToplevel):
+    '''
+    Clasa care mosteneste widget-ul TopLevel.
+
+    Metode:
+    ------
+    init - constructorul normal; initializeaza marimea ferestrei de TopLevel
+    ------
+    '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.geometry('600x400')
 
-
+# Lista cu perechi cheie:valoare pentru a verifica daca noua fereastra a unui parametru este deja deschisa
 toplevel_open = {'Temp': None, 'Humid': None, 'Speed': None, 'Presence': None, 'Live Graph': None}
 
 
 def show_graphs(param, toplevel_open=toplevel_open):
+    '''
+    Functia afiseaza diferitele grafice ale parametrilor din toplevel_open si le salveaza intr-un folder Graph Pictures.
+
+    Parametri:
+    ---------
+    param: string - tipul parametrului pentru care se face grafic ex. temp, umiditate
+    toplevel_open: string - variabila pentru a verifica daca respectiva fereastra TopLevel este deja deschisa
+    ---------
+    '''
     path = 'D:\\Downloads\\Graph Pictures'
     if 'Temp' in param:
         df = pd.read_csv('D:\\Downloads\\Temp.csv')
@@ -71,14 +89,13 @@ def open_toplevel(img, toplevel_open, param):
 
     if not toplevel_open[param]:
 
-        #TODO Rename the toplevel's titles.
         toplevel_open[param] = TopLevel()
+        toplevel_open[param].title('Graph Window')
 
-        toplevel_x = 900
+        toplevel_x = 1100
         toplevel_y = 200
         toplevel_width = 600
         toplevel_height = 400
-        #TODO Could add taking the app's window geometry characteristics to update properly in case of resizing.
 
         # Setam geometria ferestrei TopLevel deschise
         toplevel_open[param].geometry(f'{toplevel_width}x{toplevel_height}+{toplevel_x}+{toplevel_y}')

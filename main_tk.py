@@ -6,7 +6,8 @@ import tcp_file as tcp
 import arduino_file as ardu
 import live_graph as live
 import queue
-import sys
+from PIL import Image, ImageTk
+import video_file as video
 
 class Frame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -20,27 +21,49 @@ class Frame(ctk.CTkFrame):
 
         for i in range(6):
             self.grid(row=i, column=0, pady=5)
-            self.btn = ctk.CTkButton(self, text=btn_names[i], width=70, height=50,
-                                     border_width=2, border_color='green', corner_radius=32,
-                                     font=('Roboto', 14))
+            self.btn = ctk.CTkButton(self, text=btn_names[i], width=70, height=50, corner_radius=32,
+                                     border_width=2, border_color='green', font=('Roboto', 14),
+                                     image=ctk.CTkImage(light_image=Image.open(r'D:\Downloads\grafic_temp.png'),
+                                                        size=(20, 20)))
             self.btn.pack(padx=5, pady=15)
             btn_list.append(self.btn)
         return btn_list
 
     def add_lbl(self):
-        self.grid(row=0, column=0, padx=20, pady=50, sticky='nsew')
-        self.lbl = ctk.CTkLabel(self, text='\n\n\nWelcome to my project!\nInstructions:\n1. Choose your theme\n'
-                                           '2. Click the Start button and select the desired operation\n'
+        self.grid(row=0, column=0, padx=60, pady=10, sticky='e')
+        self.lbl = ctk.CTkLabel(self, text=''
                                            '', font=('Roboto', 20), text_color='green')
+        self.lbl_instruct = ctk.CTkLabel(self,
+                                text=''
+                                     '', font=('Roboto', 20), text_color='green')
         self.btn = ctk.CTkButton(self, text='Start', width=70, height=50, border_width=2, border_color='green',
                                  corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
         self.theme_btn = ctk.CTkButton(self, text='Change the Theme', width=70, height=50, border_width=2,
                                        border_color='green', corner_radius=32, font=('Roboto', 14),
                                        command=self.change_theme)
 
-        self.btn.pack(padx=5, pady=15)
-        self.theme_btn.pack(padx=5, pady=15)
-        self.lbl.pack(padx=5, pady=20)
+        self.lbl.pack(padx=5, pady=5)
+        self.btn.pack(padx=5, pady=5)
+        self.theme_btn.pack(padx=5, pady=5)
+        self.lbl_instruct.pack(padx=5, pady=5)
+
+        self.reveal_text()
+
+    def reveal_text(self):
+        original_text = "->Welcome to my project!\n->This is a data transfer and visualization interface.\n" \
+                        "->Its purpose is to facilitate processes such as reading CSV,\n->showing graphics and" \
+                        " transferring data \nfrom a microcontroller to a CSV."
+        self.animate_text(self.lbl, original_text)
+
+        instructions_text = "\nInstructions:\n1. Choose your theme\n" \
+                            "2. Click the Start button and select the desired operation"
+        self.animate_text(self.lbl_instruct, instructions_text)
+
+    def animate_text(self, label, text, delay=50, index=0):
+        if index < len(text):
+            label.configure(text=label.cget('text') + text[index])
+            self.after(delay, lambda: self.animate_text(label, text, delay, index + 1))
+
 
     def delete_frame(self):
         for widgets in self.winfo_children():
@@ -64,11 +87,12 @@ class TabView(ctk.CTkTabview):
 
     def add(self, tab_name):
         tab = super().add(tab_name)
-        self.grid(column=0, row=5, padx=50)
+        self.pack(anchor='center')
         return tab
 
     def read_tab(self):
         self.add('Read Tab')
+        app.canvas.grid()
         self.entry = ctk.CTkEntry(self.tab('Read Tab'), placeholder_text='Name and Path of the File',
                                   width=200)
         self.entry.pack(padx=20, pady=10)
@@ -113,6 +137,8 @@ class TabView(ctk.CTkTabview):
 
     def graph_tab(self):
         self.add('Graph Tab')
+        app.canvas.grid()
+
         self.btn_temp = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Temperature', corner_radius=32,
                                       font=('Roboto', 14),
                                       command=lambda: gr.show_graphs('Temp'))
@@ -133,49 +159,54 @@ class TabView(ctk.CTkTabview):
 
     def tcp_tab(self):
         self.add('TCP Tab')
+        app.canvas.grid()
 
         self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,
-                                      command=lambda: self.master.threads(thread='tcp', q=self.master.q,
-                                                                          stop_event=self.master.stop_event_tcp))
+                                      command=lambda: app.threads(thread='tcp', q=app.q,
+                                                                          stop_event=app.stop_event_tcp))
 
         self.close_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Close TCP Server', corner_radius=32, fg_color='red',
                                        hover_color='red',
-                                       command=lambda: self.master.stop_threads(thread='tcp',
-                                                                                stop_event=self.master.stop_event_tcp))
+                                       command=lambda: app.stop_threads(thread='tcp',
+                                                                                stop_event=app.stop_event_tcp))
         self.open_tcp.pack(padx=10, pady=20)
         self.close_tcp.pack(padx=10, pady=20)
 
     def rs232_tab(self):
         self.add('RS232 Tab')
+        app.canvas.grid()
+
         self.rs_open = ctk.CTkButton(self.tab('RS232 Tab'), text='Start RS Communication', corner_radius=32,
-                                     command=lambda: self.master.threads(thread='arduino', q=self.master.q,
-                                                                         p=self.master.p,
-                                                                         stop_event=self.master.stop_event_arduino))
+                                     command=lambda: app.threads(thread='arduino', q=app.q,
+                                                                         p=app.p,
+                                                                         stop_event=app.stop_event_arduino))
         self.rs_close = ctk.CTkButton(self.tab('RS232 Tab'), text='Close RS Communication', corner_radius=32,
                                       fg_color='red', hover_color='red',
-                                     command=lambda: self.master.stop_threads(thread='arduino',
-                                                                         stop_event=self.master.stop_event_arduino))
+                                     command=lambda: app.stop_threads(thread='arduino',
+                                                                         stop_event=app.stop_event_arduino))
         self.rs_open.pack(padx=10, pady=20)
         self.rs_close.pack(padx=10, pady=20)
 
     def all_tab(self):
         self.add('Live Graph')
+        app.canvas.grid()
+
         self.arduino_btn = ctk.CTkButton(self.tab('Live Graph'), text='Get Data from Microcontroller', corner_radius=32,
-                                 command=lambda: self.master.threads(thread='arduino', q=self.master.q,
-                                                                     p=self.master.p,
-                                                                     stop_event=self.master.stop_event_arduino))
+                                 command=lambda: app.threads(thread='arduino', q=app.q,
+                                                                     p=app.p,
+                                                                     stop_event=app.stop_event_arduino))
         self.arduino_btn.pack(padx=10, pady=20)
 
         self.csv_btn = ctk.CTkButton(self.tab('Live Graph'), text='Save Data in CSV', corner_radius=32,
-                                 command=lambda: self.master.threads(thread='csv', p=self.master.p))
+                                 command=lambda: app.threads(thread='csv', p=app.p))
         self.csv_btn.pack(padx=10, pady=20)
 
         self.live_graph_btn = ctk.CTkButton(self.tab('Live Graph'), text='Live Graph', corner_radius=32,
-                                 command=lambda: self.master.threads(thread='live'))
+                                 command=lambda: app.threads(thread='live'))
         self.live_graph_btn.pack(padx=10, pady=20)
 
     def close_tab(self):
-        self.add('Close Tab')
+        app.destroy()
 
     def add_command(self, btn_list):
         for btn in btn_list:
@@ -199,15 +230,19 @@ class TabView(ctk.CTkTabview):
 
 class App(ctk.CTk):
 
-    def __init__(self, root):
+    def __init__(self):
         super().__init__()
-        self.root = root
 
         self.geometry('800x500')
-        ctk.set_appearance_mode('dark')
-        ctk.set_default_color_theme('dark-blue')
+        self.rowconfigure(0, weight=1)  # row 0 takes the available vertical space
+        self.columnconfigure(0, weight=1)  # column 0 takes the available horizontal space
+        self.columnconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1, minsize=50)
 
+        ctk.set_appearance_mode('dark')
+        ctk.set_default_color_theme('dark-blue')
+
+        self.app_state = False
         self.arduino_thread = None
         self.tcp_thread = None
         self.csv_thread = None
@@ -219,29 +254,69 @@ class App(ctk.CTk):
         self.q = queue.Queue()
         self.p = queue.Queue()
 
-        self.setup()
+    def cyber_intro(self, video_source=0):
+        self.video_source = video_source
 
-    def setup(self):
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        # open video source (by default this will try to open the computer webcam)
+        self.vid = video.MyVideoCapture(self.video_source)
 
-    def on_closing(self):
-        self.root.destroy()
-        sys.exit()
+        # Create a canvas that can fit the above video source size
+        self.canvas = ctk.CTkCanvas(self, width=self.vid.width, height=self.vid.height)
+        self.canvas.configure(highlightthickness=0)
+
+        self.canvas.pack()
+        # Button that lets the user take a snapshot
+
+        # After it is called once, the update method will be automatically called every delay milliseconds
+        self.delay = 5
+
+    def update(self, check=0):
+        # Get a frame from the video source
+        ret, frame = self.vid.get_frame()
+
+        if ret:
+            self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
+            self.canvas.create_image(0, 0, image=self.photo, anchor=ctk.NW)
+            app.after(self.delay, self.update)
+        else:
+            if check == 0:
+                self.canvas.destroy()
+                self.app_state = True
+                self.intro()
 
     def intro(self):
         self.lbl_frame = Frame(self, border_width=2, border_color='red')
         self.lbl_frame.add_lbl()
 
     def btns(self):
-        self.btn_frame = Frame(self, border_width=5, border_color='orange')
+        self.btn_frame = Frame(self, border_width=3, border_color='orange')
         self.btn_list = self.btn_frame.add_btns()
-        self.btn_frame.grid(column=0, sticky='w')
+        self.btn_frame.grid(row=0, column=0, sticky='w', pady=10)
         self.tabs()
 
     def tabs(self):
-        self.tab_view = TabView(self, corner_radius=32, fg_color='silver')
-        self.tab_view.add_command(self.btn_list)
+        self.canvas = ctk.CTkCanvas(self, width=100, height=100)
+        self.canvas.configure(highlightthickness=0)
 
+        self.canvas.grid(row=0, column=1, sticky='w', padx=20, pady=10)
+        self.tab_view = TabView(self.canvas, corner_radius=32, fg_color='transparent')
+        self.tab_view.add_command(self.btn_list)
+        self.canvas.grid_remove()
+    def bg_canvas(self, master, video_source=0):
+        self.video_source = video_source
+
+        # open video source (by default this will try to open the computer webcam)
+        self.vid = video.MyVideoCapture(self.video_source)
+
+        # Create a canvas that can fit the above video source size
+        self.canvas = ctk.CTkCanvas(master, width=self.vid.width, height=self.vid.height)
+        self.canvas.configure(highlightthickness=0)
+
+        self.canvas.grid()
+
+        # After it is called once, the update method will be automatically called every delay milliseconds
+        self.delay = 5
+        app.after(app.delay, app.update)
 
     def threads(self, stop_event=None, thread=None, q=None, p=None):
 
@@ -276,10 +351,12 @@ class App(ctk.CTk):
             self.tcp_thread.join()
 
 
-
 if __name__ == '__main__':
-    root = ctk.CTk()
-    app = App(root)
-    app.intro()
+    app = App()
+    app.title('Data Transfer and Visualization Interface')
+    if app.app_state is False:
+        app.cyber_intro()
+        app.after(app.delay, app.update)
+
+
     app.mainloop()
-    sys.exit()
