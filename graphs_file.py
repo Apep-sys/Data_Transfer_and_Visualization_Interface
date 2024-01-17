@@ -33,6 +33,8 @@ def show_graphs(param, toplevel_open=toplevel_open):
     toplevel_open: string - variabila pentru a verifica daca respectiva fereastra TopLevel este deja deschisa
     ---------
     '''
+
+    # Se verifica parametri, se citesc fisierele CSV corespunzatoare si se ploteaza in consecinta
     path = 'D:\\Downloads\\Graph Pictures'
     if 'Temp' in param:
         df = pd.read_csv('D:\\Downloads\\Temp.csv')
@@ -58,6 +60,7 @@ def show_graphs(param, toplevel_open=toplevel_open):
         plt.ylabel('Prezenta')
         plt.title('Graficul prezentei')
 
+    # Folosindu-ne de numele coloanelor, preluam datele de pe acestea si le punem in dictionarul temp_data
     temp_data = {}
     col_names = df.columns.tolist()
     index_x = df['Index'].tolist()
@@ -66,9 +69,12 @@ def show_graphs(param, toplevel_open=toplevel_open):
         data = df[name].tolist()
         temp_data[name] = data
 
+    # Odata puse in dictionar, acestea sunt plotuite in functie de index si date insesi
     for data in temp_data:
         plt.plot(index_x, temp_data.get(data), label=data)
 
+    # Daca nu exista folderul din path, acesta se creeaza. Daca exista deja, nu face nimic.
+    # Intampinarea unei erori va afisa un mesaj, care spune ca folderul nu a fost creat.
     if os.path.exists(path):
         pass
     else:
@@ -78,10 +84,15 @@ def show_graphs(param, toplevel_open=toplevel_open):
         except OSError as error:
             print(f'Directory {path} could not be created.')
 
+    # Se creeaza noul path pentru imaginea graficului, alcatuita din numele acesteia si extensia .png
     path = os.path.join(path, f'grafic_{param.lower()}.png')
     plt.savefig(path)
     img = ctk.CTkImage(light_image=Image.open(path), size=(600, 400))
+
+    # Dupa salvarea si deschiderea imaginii folosind CTkImage, aceasta este deschisa intr-o noua fereastra
     open_toplevel(img, toplevel_open, param)
+
+    # Graficul este curatat, pentru a nu se suprapune intre ele
     plt.clf()
 
 

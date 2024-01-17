@@ -9,7 +9,24 @@ import queue
 from PIL import Image, ImageTk
 import video_file as video
 
+# Importam toate bibliotecile si fisierele necesare rularii aplicatiei
+
 class Frame(ctk.CTkFrame):
+    '''
+    Clasa Frame mosteneste clasa CTkFrame din modulul customtkinter.
+    Continele toate metodele referitoare la crearea widget-urilor precum butoane, label-uri si frame-uri.
+    Constructorul clasei este initializat cu obiectul app, numit master.
+
+    Metode:
+    ------
+    add_btns - adauga butoanele operatiunilor
+    add_lbl - adauga labelul care contine textul ferestrei de instructiuni si butoanele acesteia
+    reveal_text - contine mesajele pentru textul ferestrei de instructiuni si apelurile functiei animate_text
+    animate_text - adauga mesajul primit ca text in fereastra de instructiuni litera cu litera
+    delete_frame - sterge frame-ul si butoanele din fereastra de instructiuni si apeleaza functia pentru crearea
+                   butanelor meniului principal
+    change_theme - schimba tema de culoare a aplicatiei
+    '''
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.master = master
@@ -18,13 +35,15 @@ class Frame(ctk.CTkFrame):
         btn_names = ['Read CSV/XLSX', 'Graph the Data', 'RS232 Communication', 'Send to TCP',
                      'Real-Time Reading', 'Close Application']
         btn_list = []
+        image_list = ['csv_icon.png', 'graph_icon.png', 'rs_icon.png', 'tcp_icon.png', 'sensor_icon.png', 'close_icon.png']
 
         for i in range(6):
             self.grid(row=i, column=0, pady=5)
             self.btn = ctk.CTkButton(self, text=btn_names[i], width=70, height=50, corner_radius=32,
-                                     border_width=2, border_color='green', font=('Roboto', 14),
-                                     image=ctk.CTkImage(light_image=Image.open(r'D:\Downloads\grafic_temp.png'),
-                                                        size=(20, 20)))
+                                     border_width=2, fg_color= '#006400', border_color='#32CD32',
+                                     font=('Roboto', 14),
+                                     image=ctk.CTkImage(light_image=Image.open(image_list[i]),
+                                                        size=(30, 30)))
             self.btn.pack(padx=5, pady=15)
             btn_list.append(self.btn)
         return btn_list
@@ -36,10 +55,11 @@ class Frame(ctk.CTkFrame):
         self.lbl_instruct = ctk.CTkLabel(self,
                                 text=''
                                      '', font=('Roboto', 20), text_color='green')
-        self.btn = ctk.CTkButton(self, text='Start', width=70, height=50, border_width=2, border_color='green',
+        self.btn = ctk.CTkButton(self, text='Start', text_color='black', width=70, height=50, border_width=2, border_color='red',
+                                 fg_color='red',
                                  corner_radius=32, font=('Roboto', 14), command=self.delete_frame)
-        self.theme_btn = ctk.CTkButton(self, text='Change the Theme', width=70, height=50, border_width=2,
-                                       border_color='green', corner_radius=32, font=('Roboto', 14),
+        self.theme_btn = ctk.CTkButton(self, text='Change the Theme', text_color='black', width=70, height=50, border_width=2, fg_color='red',
+                                       border_color='red', corner_radius=32, font=('Roboto', 14),
                                        command=self.change_theme)
 
         self.lbl.pack(padx=5, pady=5)
@@ -50,20 +70,19 @@ class Frame(ctk.CTkFrame):
         self.reveal_text()
 
     def reveal_text(self):
-        original_text = "->Welcome to my project!\n->This is a data transfer and visualization interface.\n" \
-                        "->Its purpose is to facilitate processes such as reading CSV,\n->showing graphics and" \
-                        " transferring data \nfrom a microcontroller to a CSV."
+        original_text = "➜ Welcome to my project!\n➜ This is a data transfer and visualization interface.\n" \
+                        "➜ Its purpose is to facilitate processes such as reading CSV,\n➜ showing graphics and" \
+                        " transferring data \n➜ from a microcontroller to a CSV."
         self.animate_text(self.lbl, original_text)
 
-        instructions_text = "\nInstructions:\n1. Choose your theme\n" \
-                            "2. Click the Start button and select the desired operation"
+        instructions_text = "\n➜ Instructions:\n➜ Choose your theme\n" \
+                            "➜ Click the Start button and select the desired operation"
         self.animate_text(self.lbl_instruct, instructions_text)
 
     def animate_text(self, label, text, delay=50, index=0):
         if index < len(text):
             label.configure(text=label.cget('text') + text[index])
             self.after(delay, lambda: self.animate_text(label, text, delay, index + 1))
-
 
     def delete_frame(self):
         for widgets in self.winfo_children():
@@ -78,6 +97,9 @@ class Frame(ctk.CTkFrame):
             ctk.set_appearance_mode('dark')
 
 class TabView(ctk.CTkTabview):
+    '''
+    Clasa TabView
+    '''
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.master = master
@@ -87,12 +109,12 @@ class TabView(ctk.CTkTabview):
 
     def add(self, tab_name):
         tab = super().add(tab_name)
-        self.pack(anchor='center')
+        self.grid(row=0, column=1, sticky='w', padx=20, pady=10)
+
         return tab
 
     def read_tab(self):
         self.add('Read Tab')
-        app.canvas.grid()
         self.entry = ctk.CTkEntry(self.tab('Read Tab'), placeholder_text='Name and Path of the File',
                                   width=200)
         self.entry.pack(padx=20, pady=10)
@@ -137,7 +159,6 @@ class TabView(ctk.CTkTabview):
 
     def graph_tab(self):
         self.add('Graph Tab')
-        app.canvas.grid()
 
         self.btn_temp = ctk.CTkButton(self.tab('Graph Tab'), text='Graph Temperature', corner_radius=32,
                                       font=('Roboto', 14),
@@ -159,7 +180,6 @@ class TabView(ctk.CTkTabview):
 
     def tcp_tab(self):
         self.add('TCP Tab')
-        app.canvas.grid()
 
         self.open_tcp = ctk.CTkButton(self.tab('TCP Tab'), text='Open TCP Server', corner_radius=32,
                                       command=lambda: app.threads(thread='tcp', q=app.q,
@@ -174,8 +194,6 @@ class TabView(ctk.CTkTabview):
 
     def rs232_tab(self):
         self.add('RS232 Tab')
-        app.canvas.grid()
-
         self.rs_open = ctk.CTkButton(self.tab('RS232 Tab'), text='Start RS Communication', corner_radius=32,
                                      command=lambda: app.threads(thread='arduino', q=app.q,
                                                                          p=app.p,
@@ -189,11 +207,9 @@ class TabView(ctk.CTkTabview):
 
     def all_tab(self):
         self.add('Live Graph')
-        app.canvas.grid()
 
         self.arduino_btn = ctk.CTkButton(self.tab('Live Graph'), text='Get Data from Microcontroller', corner_radius=32,
-                                 command=lambda: app.threads(thread='arduino', q=app.q,
-                                                                     p=app.p,
+                                 command=lambda: app.threads(thread='arduino', q=app.q, p=app.p,
                                                                      stop_event=app.stop_event_arduino))
         self.arduino_btn.pack(padx=10, pady=20)
 
@@ -229,18 +245,35 @@ class TabView(ctk.CTkTabview):
                 btn.configure(command=self.all_tab)
 
 class App(ctk.CTk):
+    '''
+    Clasa App mosteneste clasa CTk din modulul customtkinter.
+    Aceasta reprezinta fereastra principala, urmand sa fie mostenita de obiectul app.
+    In constructorul clasei App se configureaza marimea ferestrei principale, atribute precum thread-uri,
+    listele tip Queue si alti parametri ai ferestrei.
 
+    Metode:
+    ------
+    cyber_intro - metoda care se ocupa de incarcarea videoclipului si crearea atributului canvas
+    update_video - metoda care se ocupa de actualizarea frame-urilor videoclipurilor
+    intro - metoda care deschide fereastra de instructiuni, imediat dupa videoclip
+    btns - metoda care apeleaza obiecte ale clasei Frame, pentru a crea obiecte
+    tabs - metoda care apeleaza obiecte ale clasei TabView, pentru a crea tab-uri separate
+    threads - metoda care se ocupa de firele de executie diverse ale aplicatiei
+    '''
     def __init__(self):
         super().__init__()
 
         self.geometry('800x500')
-        self.rowconfigure(0, weight=1)  # row 0 takes the available vertical space
-        self.columnconfigure(0, weight=1)  # column 0 takes the available horizontal space
+        self.rowconfigure(0, weight=1)  # randul 0 ocupa spatiul vertical valabil
+        self.columnconfigure(0, weight=1)  # coloana 0 ocupa spatiul orizontal valabil
         self.columnconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1, minsize=50)
 
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
+
+        self.video_source = 0
+        self.vid = None
 
         self.app_state = False
         self.arduino_thread = None
@@ -254,69 +287,56 @@ class App(ctk.CTk):
         self.q = queue.Queue()
         self.p = queue.Queue()
 
-    def cyber_intro(self, video_source=0):
-        self.video_source = video_source
+    def cyber_intro(self, canvas_check=None, video_source=None):
+
+        if video_source is not None:
+            self.video_source = video_source
+
+        if self.vid is not None:
+            self.vid.release()
 
         # open video source (by default this will try to open the computer webcam)
         self.vid = video.MyVideoCapture(self.video_source)
 
+        if canvas_check is None:
         # Create a canvas that can fit the above video source size
-        self.canvas = ctk.CTkCanvas(self, width=self.vid.width, height=self.vid.height)
-        self.canvas.configure(highlightthickness=0)
-
-        self.canvas.pack()
+            self.canvas = ctk.CTkCanvas(self, width=self.vid.width, height=self.vid.height)
+            self.canvas.configure(highlightthickness=0)
+            self.canvas.pack()
+        elif canvas_check is True:
+            self.canvas.configure(width=self.vid.width, height=self.vid.height, highlightthickness=0)
         # Button that lets the user take a snapshot
 
         # After it is called once, the update method will be automatically called every delay milliseconds
         self.delay = 5
 
-    def update(self, check=0):
+    def update_video(self, check=0):
         # Get a frame from the video source
         ret, frame = self.vid.get_frame()
 
         if ret:
             self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
             self.canvas.create_image(0, 0, image=self.photo, anchor=ctk.NW)
-            app.after(self.delay, self.update)
+            app.after(self.delay, self.update_video)
         else:
-            if check == 0:
-                self.canvas.destroy()
-                self.app_state = True
-                self.intro()
+            self.canvas.destroy()
+            self.app_state = True
+            self.intro()
 
     def intro(self):
         self.lbl_frame = Frame(self, border_width=2, border_color='red')
         self.lbl_frame.add_lbl()
 
     def btns(self):
-        self.btn_frame = Frame(self, border_width=3, border_color='orange')
+        self.btn_frame = Frame(self, border_width=3, border_color='#006400')
         self.btn_list = self.btn_frame.add_btns()
         self.btn_frame.grid(row=0, column=0, sticky='w', pady=10)
         self.tabs()
 
     def tabs(self):
-        self.canvas = ctk.CTkCanvas(self, width=100, height=100)
-        self.canvas.configure(highlightthickness=0)
 
-        self.canvas.grid(row=0, column=1, sticky='w', padx=20, pady=10)
-        self.tab_view = TabView(self.canvas, corner_radius=32, fg_color='transparent')
+        self.tab_view = TabView(self, corner_radius=32, fg_color='transparent')
         self.tab_view.add_command(self.btn_list)
-        self.canvas.grid_remove()
-    def bg_canvas(self, master, video_source=0):
-        self.video_source = video_source
-
-        # open video source (by default this will try to open the computer webcam)
-        self.vid = video.MyVideoCapture(self.video_source)
-
-        # Create a canvas that can fit the above video source size
-        self.canvas = ctk.CTkCanvas(master, width=self.vid.width, height=self.vid.height)
-        self.canvas.configure(highlightthickness=0)
-
-        self.canvas.grid()
-
-        # After it is called once, the update method will be automatically called every delay milliseconds
-        self.delay = 5
-        app.after(app.delay, app.update)
 
     def threads(self, stop_event=None, thread=None, q=None, p=None):
 
@@ -337,10 +357,9 @@ class App(ctk.CTk):
             self.csv_thread.start()
 
         elif thread == 'live':
-            self.live_graph_thread = threading.Thread(target=live.start_animation(), name='Live Graph')
+            self.live_graph_thread = threading.Thread(target=live.start_animation, name='Live Graph')
             self.live_graph_thread.daemon = True
             self.live_graph_thread.start()
-
 
     def stop_threads(self, stop_event, thread):
         if thread == 'arduino':
@@ -350,13 +369,19 @@ class App(ctk.CTk):
             stop_event.set()
             self.tcp_thread.join()
 
-
+# Daca codul este deschis in fereastra principala, codul acesteia se va executa
+# Codul ferestrei principale nu se va executa daca este important in alte fisiere
 if __name__ == '__main__':
+
+    # Se creeaza obiectul clasei App, care va servi ca fereastra principala a aplicatiei
     app = App()
     app.title('Data Transfer and Visualization Interface')
     if app.app_state is False:
         app.cyber_intro()
-        app.after(app.delay, app.update)
+        app.after(app.delay, app.update_video)
 
-
+    # Functia de loop a aplicatiei
+try:
     app.mainloop()
+except Exception:
+    pass
