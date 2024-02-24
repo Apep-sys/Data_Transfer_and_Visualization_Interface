@@ -35,7 +35,8 @@ class Frame(ctk.CTkFrame):
         btn_names = ['Read CSV/XLSX', 'Graph the Data', 'RS232 Communication', 'Send to TCP',
                      'Real-Time Reading', 'Close Application']
         btn_list = []
-        image_list = ['csv_icon.png', 'graph_icon.png', 'rs_icon.png', 'tcp_icon.png', 'sensor_icon.png', 'close_icon.png']
+        image_list = ['Icons\\csv_icon.png', 'Icons\\graph_icon.png', 'Icons\\rs_icon.png', 'Icons\\tcp_icon.png',
+                      'Icons\\sensor_icon.png', 'Icons\\close_icon.png']
 
         for i in range(6):
             self.grid(row=i, column=0, pady=5)
